@@ -151,6 +151,11 @@ public abstract class FileUploadBase {
     @Deprecated
     public static final int MAX_HEADER_SIZE = 1024;
 
+    /**
+     * Default per part header size limit in bytes.
+     */
+    public static final int DEFAULT_PART_HEADER_SIZE_MAX = 512;
+
     // ----------------------------------------------------------- Data members
 
     /**
@@ -170,6 +175,11 @@ public abstract class FileUploadBase {
      * request. A value of -1 indicates no maximum.
      */
     private long fileCountMax = -1;
+
+    /**
+     * The maximum permitted size of the headers provided with a single part in bytes.
+     */
+    private int partHeaderSizeMax = DEFAULT_PART_HEADER_SIZE_MAX;
 
     /**
      * The content encoding to use when reading part headers.
@@ -265,6 +275,24 @@ public abstract class FileUploadBase {
         this.fileCountMax = fileCountMax;
     }
 
+
+    /**
+     * Obtain the per part size limit for headers.
+     *
+     * @return The maximum size of the headers for a single part in bytes.
+     */
+    public int getPartHeaderSizeMax() {
+        return partHeaderSizeMax;
+    }
+
+    /**
+     * Sets the per part size limit for headers.
+     *
+     * @param partHeaderSizeMax The maximum size of the headers in bytes.
+     */
+    public void setPartHeaderSizeMax(int partHeaderSizeMax) {
+        this.partHeaderSizeMax = partHeaderSizeMax;
+    }
 
     /**
      * Retrieves the character encoding used when reading the headers of an
@@ -1042,6 +1070,7 @@ public abstract class FileUploadBase {
                         format("The boundary specified in the %s header is too long", CONTENT_TYPE), iae);
             }
             multi.setHeaderEncoding(charEncoding);
+            multi.setPartHeaderSizeMax(getPartHeaderSizeMax());
 
             skipPreamble = true;
             findNextItem();
